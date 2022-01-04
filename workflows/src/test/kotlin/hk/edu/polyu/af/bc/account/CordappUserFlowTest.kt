@@ -1,11 +1,11 @@
 package hk.edu.polyu.af.bc.account
 
-import hk.edu.polyu.af.bc.account.flows.client.CreateCordappUser
+import com.r3.corda.lib.accounts.contracts.states.AccountInfo
+import hk.edu.polyu.af.bc.account.flows.CreateCordappUser
+import hk.edu.polyu.af.bc.account.flows.ShareCordappUser
 import hk.edu.polyu.af.bc.account.identity.CordappUser
 import net.corda.testing.node.MockNetwork
-import net.corda.testing.node.MockNetworkParameters
 import net.corda.testing.node.StartedMockNode
-import net.corda.testing.node.TestCordapp
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -55,16 +55,7 @@ class CordappUserFlowTest {
 
     @Before
     fun setup() {
-        network = MockNetwork(
-            MockNetworkParameters(cordappsForAllNodes = listOf(
-                TestCordapp.findCordapp("hk.edu.polyu.af.bc.message.contracts"),
-                TestCordapp.findCordapp("hk.edu.polyu.af.bc.message.flows"),
-                TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.flows"),
-                TestCordapp.findCordapp("com.r3.corda.lib.accounts.workflows.flows"),
-                TestCordapp.findCordapp("com.r3.corda.lib.accounts.contracts")
-            ))
-        )
-
+        network = MockNetwork(mockNetworkParameters)
         a = network.createPartyNode()
         b = network.createPartyNode()
         network.runNetwork()
@@ -76,12 +67,22 @@ class CordappUserFlowTest {
     }
 
     @Test
-    fun `create user at node a`() {
+    fun canCreateUser() {
         val user1 = SimpleCordappUser("user1")
         a.startFlow(CreateCordappUser(user1)).getOrThrow(network)
 
         logger.info("user1: $user1")
         assertNotNull(user1.getAccountHostCordaX500Name())
         assertNotNull(user1.getAccountUUID())
+    }
+
+    @Test
+    fun canShareUser() {
+        val user2 = SimpleCordappUser("user2")
+        b.startFlow(CreateCordappUser(user2)).getOrThrow(network)  //create
+        b.startFlow(ShareCordappUser(user2, listOf(a.party()))).getOrThrow(network)  // share with a
+
+        b.assertHaveState(AccountInfo::class.java) { it.name == "user2" }
+        a.assertHaveState(AccountInfo::class.java) { it.name == "user2" }
     }
 }
