@@ -1,25 +1,5 @@
-# Usage
+# Account Library
 
-1. Clone this repository (skip this step if the repo is on your local machine). The default branch is fine.
+A library to facilitate mapping between the RPC(client)-side user (`CordappUser`) and Corda identity (`AbstractParty`) in the smart contracts. It provides node-level user management workflows and utility flows and functions for defining domain-level workflows using client-side user identities.
 
-```shell
-git clone https://github.com/AFBlockchain/cordapp-template-kotlin
-```
-
-2. Rename the project
-
-```shell
-mv cordapp-template-kotlin $PROJECT_NAME
-cd $PROJECT_NAME
-```
-
-3. Re-initialize git repository
-
-```shell
-rm -rf .git
-git init
-```
-
-4. Refactor source code packages. If you are using IntelliJ, check [here](https://www.jetbrains.com/help/idea/refactoring-source-code.html#popular-refactorings).
-
-5. Start coding :)
+The need for this mapping arises from the limitation that users of the smart contracts in certain applications do not operate full nodes. Then for the Cordapp developers, they need to think of other ways to represent the users on-chain. Corda's `account-sdk` can assist but its direct usage makes the smart contracts more difficult to write and interact poorly with smart contracts that do not involve accounts. In contrast, this library can let developers write smart contracts as if all users operate a full node with minimum adjustment.
