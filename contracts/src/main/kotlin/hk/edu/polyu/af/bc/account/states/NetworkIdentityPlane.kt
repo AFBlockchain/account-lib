@@ -27,4 +27,8 @@ class NetworkIdentityPlane(
 ): ContractState, LinearState {
     override val participants: List<AbstractParty>
         get() = partiesInPlane
+
+    override fun toString(): String {
+        return "NetworkIdentityPlane(name='$name', partiesInPlane=$partiesInPlane, linearId=$linearId)"
+    }
 }
