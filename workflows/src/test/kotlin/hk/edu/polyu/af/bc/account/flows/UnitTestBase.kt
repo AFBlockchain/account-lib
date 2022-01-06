@@ -24,7 +24,7 @@ abstract class UnitTestBase {
     protected lateinit var partyC: StartedMockNode
 
     @Before
-    fun setup() {
+    open fun setup() {
         network = MockNetwork(
             MockNetworkParameters(cordappsForAllNodes = listOf(
                 TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.contracts"),

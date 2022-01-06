@@ -2,7 +2,7 @@ package hk.edu.polyu.af.bc.account.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import hk.edu.polyu.af.bc.account.SimpleCordappUser
-import hk.edu.polyu.af.bc.account.identity.CordappUser
+import hk.edu.polyu.af.bc.account.user.CordappUser
 import hk.edu.polyu.af.bc.message.flows.SendMessage
 import hk.edu.polyu.af.bc.message.states.MessageState
 import net.corda.core.flows.FlowLogic

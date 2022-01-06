@@ -4,7 +4,7 @@ import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.accounts.contracts.states.AccountInfo
 import com.r3.corda.lib.accounts.workflows.flows.AccountInfoByUUID
 import com.r3.corda.lib.accounts.workflows.flows.RequestKeyForAccount
-import hk.edu.polyu.af.bc.account.identity.CordappUser
+import hk.edu.polyu.af.bc.account.user.CordappUser
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.FlowException

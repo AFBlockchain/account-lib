@@ -4,7 +4,7 @@ import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.accounts.contracts.states.AccountInfo
 import com.r3.corda.lib.accounts.workflows.flows.CreateAccount
 import com.r3.corda.lib.accounts.workflows.flows.ShareAccountInfo
-import hk.edu.polyu.af.bc.account.identity.CordappUser
+import hk.edu.polyu.af.bc.account.user.CordappUser
 import net.corda.core.flows.FlowLogic
 import net.corda.core.identity.Party
 

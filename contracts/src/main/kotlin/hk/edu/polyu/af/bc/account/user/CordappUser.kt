@@ -1,4 +1,4 @@
-package hk.edu.polyu.af.bc.account.identity
+package hk.edu.polyu.af.bc.account.user
 
 import java.util.*
 
