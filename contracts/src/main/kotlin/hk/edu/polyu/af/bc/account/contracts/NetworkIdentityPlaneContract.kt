@@ -3,6 +3,8 @@ package hk.edu.polyu.af.bc.account.contracts
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
+import net.corda.core.contracts.requireSingleCommand
+import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
 
 /**
@@ -26,6 +28,23 @@ class NetworkIdentityPlaneContract: Contract {
     }
 
     override fun verify(tx: LedgerTransaction) {
-        TODO("Not yet implemented")
+        val command = tx.commands.requireSingleCommand<Commands>()
+
+        when(command.value) {
+            is Commands.Create -> requireThat {
+                val output = tx.outputsOfType<NetworkIdentityPlane>().single()
+                "All parties must be signers." using (command.signers.containsAll(output.participants.map {it.owningKey}))
+            }
+
+            is Commands.Update -> requireThat {
+                val output = tx.outputsOfType<NetworkIdentityPlane>().single()
+                val input = tx.inputsOfType<NetworkIdentityPlane>().single()
+                "All parties must be signers." using (command.signers.containsAll(output.participants.map {it.owningKey}))
+                "Name must be changed." using (input.name != output.name)
+                "Parties can not be changed." using (input.participants.size == output.participants.size && input.participants.containsAll(output.participants))
+                "LinerId can not be changed." using (input.linearId == output.linearId)
+            }
+        }
+
     }
 }
