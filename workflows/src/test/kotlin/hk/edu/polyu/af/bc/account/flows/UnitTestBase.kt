@@ -1,4 +1,4 @@
-package hk.edu.polyu.af.bc.account
+package hk.edu.polyu.af.bc.account.flows
 
 import net.corda.core.identity.CordaX500Name
 import net.corda.testing.common.internal.testNetworkParameters

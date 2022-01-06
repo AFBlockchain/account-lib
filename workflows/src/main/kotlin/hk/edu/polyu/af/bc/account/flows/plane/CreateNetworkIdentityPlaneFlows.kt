@@ -1,4 +1,4 @@
-package hk.edu.polyu.af.bc.account.flows
+package hk.edu.polyu.af.bc.account.flows.plane
 
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.flows.*

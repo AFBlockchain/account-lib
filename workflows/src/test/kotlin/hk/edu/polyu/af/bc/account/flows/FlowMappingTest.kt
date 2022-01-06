@@ -1,9 +1,7 @@
-package hk.edu.polyu.af.bc.account
+package hk.edu.polyu.af.bc.account.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import hk.edu.polyu.af.bc.account.flows.CreateCordappUser
-import hk.edu.polyu.af.bc.account.flows.ShareCordappUser
-import hk.edu.polyu.af.bc.account.flows.toAnonymousParty
+import hk.edu.polyu.af.bc.account.SimpleCordappUser
 import hk.edu.polyu.af.bc.account.identity.CordappUser
 import hk.edu.polyu.af.bc.message.flows.SendMessage
 import hk.edu.polyu.af.bc.message.states.MessageState

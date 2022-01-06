@@ -1,8 +1,7 @@
 package hk.edu.polyu.af.bc.account
 
 import com.r3.corda.lib.accounts.contracts.states.AccountInfo
-import hk.edu.polyu.af.bc.account.flows.CreateCordappUser
-import hk.edu.polyu.af.bc.account.flows.ShareCordappUser
+import hk.edu.polyu.af.bc.account.flows.*
 import hk.edu.polyu.af.bc.account.identity.CordappUser
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.StartedMockNode

@@ -1,7 +1,6 @@
-package hk.edu.polyu.af.bc.account
+package hk.edu.polyu.af.bc.account.flows.plane
 
-import hk.edu.polyu.af.bc.account.flows.CreateNetworkIdentityPlane
-import hk.edu.polyu.af.bc.account.flows.PlaneExistsException
+import hk.edu.polyu.af.bc.account.flows.*
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import org.junit.Test
 import org.slf4j.Logger
