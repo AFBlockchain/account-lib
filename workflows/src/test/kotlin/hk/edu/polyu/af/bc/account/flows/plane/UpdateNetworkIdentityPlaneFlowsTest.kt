@@ -4,6 +4,7 @@ import hk.edu.polyu.af.bc.account.flows.*
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.contracts.LinearPointer
 import net.corda.core.contracts.StateAndRef
+import net.corda.core.flows.FlowException
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -44,7 +45,7 @@ class UpdateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
     }
 
 
-    @Test(expected = PlaneExistsException::class)
+    @Test(expected = FlowException::class)
     fun `should rejects update when there is name conflict at other parties`() {
         logger.info("Creating plane-1 for PartyA")
         val tx1 = partyA.startFlow(CreateNetworkIdentityPlane("plane-1", listOf())).getOrThrow(network)

@@ -24,7 +24,7 @@ class CreateNetworkIdentityPlaneFlow(
         val allNetworkIdentityPlanes = subFlow(GetAllNetworkIdentityPlanes())
         for(netWorkIdentityPlane in allNetworkIdentityPlanes) {
             require(netWorkIdentityPlane.name != name) {
-                "The name already exists"
+                throw FlowException()
             }
         }
 
@@ -63,7 +63,7 @@ class CreateNetworkIdentityPlaneResponderFlow(
                 val allNetworkIdentityPlanes = subFlow(GetAllNetworkIdentityPlanes())
                 for(netWorkIdentityPlane in allNetworkIdentityPlanes) {
                     val output = stx.tx.outputStates[0] as NetworkIdentityPlane
-                    check(netWorkIdentityPlane.name != output.name) {"The name has already exist"}
+                    check(netWorkIdentityPlane.name != output.name) {throw FlowException()}
                 }
             }
         }

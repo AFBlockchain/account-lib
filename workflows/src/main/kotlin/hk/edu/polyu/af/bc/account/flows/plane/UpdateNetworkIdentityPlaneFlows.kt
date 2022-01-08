@@ -4,7 +4,6 @@ import co.paralleluniverse.fibers.Suspendable
 import hk.edu.polyu.af.bc.account.contracts.NetworkIdentityPlaneContract
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.contracts.StateAndRef
-import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
@@ -25,7 +24,7 @@ class UpdateNetworkIdentityPlaneFlow(
         val allNetworkIdentityPlanes = subFlow(GetAllNetworkIdentityPlanes())
         for(netWorkIdentityPlane in allNetworkIdentityPlanes) {
             require(netWorkIdentityPlane.name != newName) {
-                throw PlaneExistsException(newName,ourIdentity)
+                throw FlowException()
             }
         }
 
@@ -66,7 +65,7 @@ class UpdateNetworkIdentityPlaneResponderFlow(
                 val allNetworkIdentityPlanes = subFlow(GetAllNetworkIdentityPlanes())
                 for(netWorkIdentityPlane in allNetworkIdentityPlanes) {
                     val output = stx.tx.outputStates[0] as NetworkIdentityPlane
-                    check(netWorkIdentityPlane.name != output.name) {"The name has already exist"}
+                    check(netWorkIdentityPlane.name != output.name) {throw FlowException()}
                 }
             }
         }
