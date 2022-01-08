@@ -1,8 +1,6 @@
 package hk.edu.polyu.af.bc.account.flows.plane
 
-import hk.edu.polyu.af.bc.account.flows.plane.NetworkIdentityPlaneContext.Companion.currentPlane
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
-import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
 
 /// Flows to manage the current NetworkIdentityPlane at the corda node
@@ -10,22 +8,25 @@ import net.corda.core.flows.FlowLogic
 /**
  * Return the current [NetworkIdentityPlane] in the [NetworkIdentityPlaneContext].
  */
-class GetCurrentNetworkIdentityPlane(): FlowLogic<NetworkIdentityPlane?>() {
+class GetCurrentNetworkIdentityPlane: FlowLogic<NetworkIdentityPlane?>() {
     override fun call(): NetworkIdentityPlane? {
-        if(currentPlane==null){
-            throw FlowException("currentPlane is null")
-        }
-
-        return currentPlane
+        return NetworkIdentityPlaneContext.currentPlane
     }
 }
 
 /**
- * Set the current [NetworkIdentityPlaneContext] to hold the given plane
+ * Set the current [NetworkIdentityPlaneContext] to hold the given plane.
  */
 class SetCurrentNetworkIdentityPlane(val plane: NetworkIdentityPlane): FlowLogic<Unit>() {
-    override fun call(): Unit {
-        
-        NetworkIdentityPlaneContext.currentPlane=plane
+    override fun call() {
+        //TODO: check that the plane has been registered on this node
+        NetworkIdentityPlaneContext.currentPlane = plane
+    }
+}
+
+
+class SetCurrentNetworkIdentityPlaneByName(val planeName: String): FlowLogic<Unit>() {
+    override fun call() {
+        TODO("Not yet implemented")
     }
 }

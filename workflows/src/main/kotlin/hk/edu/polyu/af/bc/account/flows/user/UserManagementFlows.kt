@@ -1,5 +1,7 @@
 package hk.edu.polyu.af.bc.account.flows.user
 
+import com.r3.corda.lib.accounts.workflows.flows.AllAccounts
+import com.r3.corda.lib.accounts.workflows.flows.CreateAccount
 import net.corda.core.flows.FlowLogic
 import java.util.*
 
@@ -8,19 +10,24 @@ import java.util.*
 
 /**
  * Create a user in the current identity plane.
+ *
+ * TODO: introduce naming constraint. Assume simple name (alphabet + digits)
  */
-class CreateUser(val username: String): FlowLogic<Unit>() {
+class CreateUser(private val username: String): FlowLogic<Unit>() {
     override fun call() {
-        TODO("Not yet implemented")
+        val accountName = toAccountName(username)
+        if (!isAccountNonExist(accountName)) throw UserExistsException(username, context)
+
+        subFlow(CreateAccount(accountName))
     }
 }
 
 /**
  * Check whether the user given exists in the current identity plane.
  */
-class IsUserExists(val username: String): FlowLogic<Boolean>() {
+class IsUserExists(private val username: String): FlowLogic<Boolean>() {
     override fun call(): Boolean {
-        TODO("Not yet implemented")
+        return !isAccountNonExist(toAccountName(username))
     }
 }
 
@@ -29,7 +36,13 @@ class IsUserExists(val username: String): FlowLogic<Boolean>() {
  */
 class AllUsers(): FlowLogic<List<String>>() {
     override fun call(): List<String> {
-        TODO("Not yet implemented")
+        return subFlow(AllAccounts()).map {
+            it.state.data.name
+        }.filter {
+            it.split(DELIMINATOR)[0] == context.name
+        }.map {
+            it.split(DELIMINATOR)[1]
+        }
     }
 }
 
