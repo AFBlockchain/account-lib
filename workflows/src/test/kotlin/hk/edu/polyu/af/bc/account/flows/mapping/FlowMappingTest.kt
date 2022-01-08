@@ -1,10 +1,11 @@
-package hk.edu.polyu.af.bc.account
+package hk.edu.polyu.af.bc.account.flows.mapping
 
 import co.paralleluniverse.fibers.Suspendable
-import hk.edu.polyu.af.bc.account.flows.CreateCordappUser
-import hk.edu.polyu.af.bc.account.flows.ShareCordappUser
-import hk.edu.polyu.af.bc.account.flows.toAnonymousParty
-import hk.edu.polyu.af.bc.account.identity.CordappUser
+import hk.edu.polyu.af.bc.account.flows.*
+import hk.edu.polyu.af.bc.account.flows.plane.CreateNetworkIdentityPlane
+import hk.edu.polyu.af.bc.account.flows.plane.SetCurrentNetworkIdentityPlane
+import hk.edu.polyu.af.bc.account.flows.user.CreateUser
+import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import hk.edu.polyu.af.bc.message.flows.SendMessage
 import hk.edu.polyu.af.bc.message.states.MessageState
 import net.corda.core.flows.FlowLogic
@@ -17,8 +18,8 @@ import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class SendMessageUser(private val sender: CordappUser,
-                      private val receiver: CordappUser,
+class SendMessageUser(private val sender: String,
+                      private val receiver: String,
                       private val msg: String): FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
@@ -33,7 +34,6 @@ class FlowMappingTest{
     private lateinit var network: MockNetwork
     private lateinit var a: StartedMockNode
     private lateinit var b: StartedMockNode
-    private var users: MutableMap<String, CordappUser> = mutableMapOf()
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(FlowMappingTest::class.java)
@@ -46,22 +46,16 @@ class FlowMappingTest{
         b = network.createPartyNode()
         network.runNetwork()
 
+        // create an identity plane and set it for a and b
+        val plane = a.startFlow(CreateNetworkIdentityPlane("message-plane", listOf(b.party()))).getOrThrow(network).output(NetworkIdentityPlane::class.java)
+        a.startFlow(SetCurrentNetworkIdentityPlane(plane)).getOrThrow(network)
+        b.startFlow(SetCurrentNetworkIdentityPlane(plane)).getOrThrow(network)
+
         // create cordapp users
-        val user1 = SimpleCordappUser("user1")
-        val user2 = SimpleCordappUser("user2")
-        a.startFlow(CreateCordappUser(user1)).getOrThrow(network)
-        logger.info("User created: $user1")
-        b.startFlow(CreateCordappUser(user2)).getOrThrow(network)
-        logger.info("User created: $user2")
-
-        // share the account
-        a.startFlow(ShareCordappUser(user1, listOf(b.party())))
-        logger.info("User shared: $user1")
-        b.startFlow(ShareCordappUser(user2, listOf(a.party())))
-        logger.info("User shared: $user2")
-
-        users["user1"] = user1
-        users["user2"] = user2
+        a.startFlow(CreateUser("user1")).getOrThrow(network)
+        logger.info("User created: user1")
+        b.startFlow(CreateUser("user2")).getOrThrow(network)
+        logger.info("User created: user2")
     }
 
     @After
@@ -71,7 +65,7 @@ class FlowMappingTest{
 
     @Test
     fun sendMessageWithCordappUsers() {
-        val messageState = a.startFlow(SendMessageUser(users["user1"]!!, users["user2"]!!, "Hello Cordapp"))
+        val messageState = a.startFlow(SendMessageUser("user1", "user2", "Hello Cordapp"))
             .getOrThrow(network)
             .output(MessageState::class.java)
 

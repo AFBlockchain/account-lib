@@ -1,8 +1,7 @@
-package hk.edu.polyu.af.bc.account
+package hk.edu.polyu.af.bc.account.flows
 
-import com.sun.org.apache.xpath.internal.operations.Bool
+import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.concurrent.CordaFuture
-import net.corda.core.contracts.Contract
 import net.corda.core.contracts.ContractState
 import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
@@ -54,4 +53,8 @@ fun <T: ContractState> StartedMockNode.assertHaveState(stateClass: Class<T>, mat
 fun <V> CordaFuture<V>.getOrThrow(network: MockNetwork, rounds: Int = -1, timeout: Duration? = null): V {
     network.runNetwork(rounds);
     return getOrThrow(timeout)
+}
+
+val planeComparator = {
+        p1: NetworkIdentityPlane, p2: NetworkIdentityPlane -> p1.linearId == p2.linearId
 }
