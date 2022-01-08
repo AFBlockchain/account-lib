@@ -1,4 +1,4 @@
-package hk.edu.polyu. af.bc.account.flows.plane
+package hk.edu.polyu.af.bc.account.flows.plane
 
 import hk.edu.polyu.af.bc.account.flows.plane.NetworkIdentityPlaneContext.Companion.currentPlane
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
