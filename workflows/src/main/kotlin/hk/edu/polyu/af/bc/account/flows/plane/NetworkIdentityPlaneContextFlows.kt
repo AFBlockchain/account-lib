@@ -25,9 +25,7 @@ class GetCurrentNetworkIdentityPlane(): FlowLogic<NetworkIdentityPlane?>() {
  */
 class SetCurrentNetworkIdentityPlane(val plane: NetworkIdentityPlane): FlowLogic<Unit>() {
     override fun call(): Unit {
-        if(currentPlane==null){
-            throw FlowException("currentPlane is null")
-        }
+        
         NetworkIdentityPlaneContext.currentPlane=plane
     }
 }
