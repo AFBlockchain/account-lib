@@ -2,6 +2,7 @@ package hk.edu.polyu.af.bc.account.flows.plane
 
 import hk.edu.polyu.af.bc.account.flows.*
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
+import net.corda.core.flows.FlowException
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +26,7 @@ class CreateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
     }
 
 
-    @Test(expected = PlaneExistsException::class)
+    @Test(expected = FlowException::class)
     fun `should rejects creation when there is name conflict at other parties`() {
         logger.info("Creating plane-1 for PartyB")
         partyB.startFlow(CreateNetworkIdentityPlane("plane-1", listOf())).getOrThrow(network)

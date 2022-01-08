@@ -22,7 +22,7 @@ class NetworkIdentityPlaneContextFlowsTest: UnitTestBase() {
 
     @Test
     fun `can set the plane when the plane is not created at current node`() {
-        val plane = partyA.startFlow(CreateNetworkIdentityPlane("plane-abc", listOf(partyA.party(), partyB.party(), partyC.party())))
+        val plane = partyA.startFlow(CreateNetworkIdentityPlane("plane-abc", listOf(partyB.party(), partyC.party())))
             .getOrThrow(network)
             .output(NetworkIdentityPlane::class.java)
 
