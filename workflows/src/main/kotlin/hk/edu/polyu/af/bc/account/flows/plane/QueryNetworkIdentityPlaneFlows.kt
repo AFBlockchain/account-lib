@@ -19,14 +19,13 @@ class GetAllNetworkIdentityPlanes(): FlowLogic<List<NetworkIdentityPlane>>() {
 }
 
 /**
- * Return the [NetworkIdentityPlane]s by the name.
- * only one plan can be found
+ * Return the [NetworkIdentityPlane]s by the name. Null if the plane by the given name is not found.
  */
 @StartableByRPC
 @StartableByService
-class GetNetworkIdentityPlaneByName(val name: String): FlowLogic<NetworkIdentityPlane>() {
-    override fun call(): NetworkIdentityPlane {
+class GetNetworkIdentityPlaneByName(val name: String): FlowLogic<NetworkIdentityPlane?>() {
+    override fun call(): NetworkIdentityPlane? {
         val allPlanes = subFlow(GetAllNetworkIdentityPlanes())
-        return allPlanes.filter{it.name == name}[0]
+        return allPlanes.firstOrNull { it.name == name }
     }
 }

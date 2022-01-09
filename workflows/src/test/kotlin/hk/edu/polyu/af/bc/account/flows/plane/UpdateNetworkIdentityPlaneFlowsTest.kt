@@ -5,12 +5,14 @@ import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.contracts.LinearPointer
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FlowException
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.test.assertEquals
 
-
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UpdateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
     companion object {
         val logger: Logger = LoggerFactory.getLogger(UpdateNetworkIdentityPlaneFlowsTest::class.java)
@@ -40,28 +42,28 @@ class UpdateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
         partyA.assertHaveState(plane2, planeComparator)
 
         assertEquals("plane-2",plane2.name)
-
-
     }
 
 
-    @Test(expected = FlowException::class)
+    @Test
     fun `should rejects update when there is name conflict at other parties`() {
-        logger.info("Creating plane-1 for PartyA")
-        val tx1 = partyA.startFlow(CreateNetworkIdentityPlane("plane-1", listOf())).getOrThrow(network)
+        logger.info("Creating plane-3 for PartyA")
+        val tx1 = partyA.startFlow(CreateNetworkIdentityPlane("plane-3", listOf())).getOrThrow(network)
 
-        logger.info("Creating plane-2 for PartyA, PartyB")
-        partyB.startFlow(CreateNetworkIdentityPlane("plane-2", listOf(partyA.party()))).getOrThrow(network)
+        logger.info("Creating plane-4 for PartyA, PartyB")
+        partyB.startFlow(CreateNetworkIdentityPlane("plane-4", listOf(partyA.party()))).getOrThrow(network)
 
         logger.info("Update the name")
         //query the NetworkIdentityPlane by uuid
         val plane = tx1.output(NetworkIdentityPlane::class.java)
-        val networkIdentityPlaneRef: StateAndRef<NetworkIdentityPlane> = LinearPointer<NetworkIdentityPlane>(
+        val networkIdentityPlaneRef: StateAndRef<NetworkIdentityPlane> = LinearPointer(
             plane.linearId,
             NetworkIdentityPlane::class.java,
             false).resolve(partyA.services)
 
-        logger.info("Update the name to plane-2")
-        partyA.startFlow(UpdateNetworkIdentityPlane("plane-2",networkIdentityPlaneRef)).getOrThrow(network)
+        logger.info("Update the name to plane-4")
+        assertThrows<FlowException> {
+            partyA.startFlow(UpdateNetworkIdentityPlane("plane-4",networkIdentityPlaneRef)).getOrThrow(network)
+        }
     }
 }

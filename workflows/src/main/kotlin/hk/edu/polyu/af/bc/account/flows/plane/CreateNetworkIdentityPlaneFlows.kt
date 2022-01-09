@@ -29,7 +29,7 @@ class CreateNetworkIdentityPlaneFlow(
         }
 
         //Create transaction
-
+        //TODO: check the participants list (e.g., if the current node is passed in, the flow fails)
         val participants = ArrayList(otherParticipants)
         participants.add(ourIdentity)
         val networkIdentityPlane = NetworkIdentityPlane(name,participants as List<Party>, UniqueIdentifier())

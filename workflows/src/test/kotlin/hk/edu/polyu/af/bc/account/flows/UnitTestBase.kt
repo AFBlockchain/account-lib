@@ -6,8 +6,8 @@ import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetworkParameters
 import net.corda.testing.node.StartedMockNode
 import net.corda.testing.node.TestCordapp
-import org.junit.After
-import org.junit.Before
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 
 /**
  * This class provides default setup and configuration for unit-testing this module.
@@ -23,11 +23,13 @@ abstract class UnitTestBase {
     protected lateinit var partyB: StartedMockNode
     protected lateinit var partyC: StartedMockNode
 
-    @Before
+    @BeforeAll
     open fun setup() {
         network = MockNetwork(
             MockNetworkParameters(cordappsForAllNodes = listOf(
                 TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.contracts"),
+                TestCordapp.findCordapp("com.r3.corda.lib.accounts.workflows.flows"),
+                TestCordapp.findCordapp("com.r3.corda.lib.accounts.contracts"),
                 TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.flows")
             ), networkParameters = testNetworkParameters(minimumPlatformVersion = 4)))
 
@@ -37,7 +39,7 @@ abstract class UnitTestBase {
         network.runNetwork()
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         network.stopNodes()
     }

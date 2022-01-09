@@ -14,12 +14,12 @@ const val DELIMINATOR = "/"
 /**
  * A shortcut to fetch the current [NetworkIdentityPlane] for the node.
  */
-val context: NetworkIdentityPlane = NetworkIdentityPlaneContext.currentPlane ?: throw IllegalStateException("NetworkIdentityPlane is not set")
+fun context(): NetworkIdentityPlane = NetworkIdentityPlaneContext.currentPlane ?: throw IllegalStateException("NetworkIdentityPlane is not set")
 
 /**
  * Map the application username to account name
  */
-fun toAccountName(username: String): String = "${context.name}${DELIMINATOR}${username}"
+fun toAccountName(username: String): String = "${context().name}${DELIMINATOR}${username}"
 
 /**
  * Check whether an account exists

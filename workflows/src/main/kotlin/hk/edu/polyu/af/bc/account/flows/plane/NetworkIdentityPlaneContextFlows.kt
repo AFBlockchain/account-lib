@@ -20,13 +20,16 @@ class GetCurrentNetworkIdentityPlane: FlowLogic<NetworkIdentityPlane?>() {
 class SetCurrentNetworkIdentityPlane(val plane: NetworkIdentityPlane): FlowLogic<Unit>() {
     override fun call() {
         //TODO: check that the plane has been registered on this node
+        subFlow(GetNetworkIdentityPlaneByName(plane.name)) ?: throw IllegalArgumentException("Plane not found: $plane")
+        logger.info("Setting network identity plane to: $plane")
         NetworkIdentityPlaneContext.currentPlane = plane
     }
 }
 
 
-class SetCurrentNetworkIdentityPlaneByName(val planeName: String): FlowLogic<Unit>() {
+class SetCurrentNetworkIdentityPlaneByName(private val planeName: String): FlowLogic<Unit>() {
     override fun call() {
-        TODO("Not yet implemented")
+        val plane = subFlow(GetNetworkIdentityPlaneByName(planeName)) ?: throw IllegalArgumentException("Plane not found: $planeName")
+        subFlow(SetCurrentNetworkIdentityPlane(plane))
     }
 }

@@ -1,15 +1,22 @@
 package hk.edu.polyu.af.bc.account.flows.user
 
-import hk.edu.polyu.af.bc.account.flows.*
+import hk.edu.polyu.af.bc.account.flows.UnitTestBase
+import hk.edu.polyu.af.bc.account.flows.getOrThrow
+import hk.edu.polyu.af.bc.account.flows.output
+import hk.edu.polyu.af.bc.account.flows.party
 import hk.edu.polyu.af.bc.account.flows.plane.CreateNetworkIdentityPlane
+import hk.edu.polyu.af.bc.account.flows.plane.GetCurrentNetworkIdentityPlane
 import hk.edu.polyu.af.bc.account.flows.plane.SetCurrentNetworkIdentityPlane
+import hk.edu.polyu.af.bc.account.flows.plane.SetCurrentNetworkIdentityPlaneByName
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
-import org.junit.Before
-import org.junit.Test
+import net.corda.core.flows.FlowException
+import org.junit.jupiter.api.*
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserManagementFlowsTest: UnitTestBase() {
-    @Before
+    @BeforeAll
     override fun setup() {
         super.setup()
 
@@ -42,16 +49,21 @@ class UserManagementFlowsTest: UnitTestBase() {
         assert(partyC.startFlow(IsUserExists("dilan")).getOrThrow(network))
     }
 
-    @Test(expected = UserExistsException::class)
+    @Test
     fun `cannot create users with the same name at the same node`() {
         partyA.startFlow(CreateUser("eva")).getOrThrow(network)
-        partyA.startFlow(CreateUser("eva")).getOrThrow(network)
+
+        assertThrows<FlowException> {
+            partyA.startFlow(CreateUser("eva")).getOrThrow(network)
+        }
     }
 
-    @Test(expected = UserExistsException::class)
+    @Test
     fun `cannot create users with the same name at different nodes`() {
         partyA.startFlow(CreateUser("fiona")).getOrThrow(network)
-        partyB.startFlow(CreateUser("fiona")).getOrThrow(network)
+        assertThrows<FlowException> {
+            partyB.startFlow(CreateUser("fiona")).getOrThrow(network)
+        }
     }
 
     @Test
@@ -65,5 +77,29 @@ class UserManagementFlowsTest: UnitTestBase() {
         partyA.startFlow(SetCurrentNetworkIdentityPlane(plane))
 
         assertFalse(partyA.startFlow(IsUserExists("gina")).getOrThrow(network))
+
+        partyA.startFlow(SetCurrentNetworkIdentityPlaneByName("test-plane")) //restore
+    }
+
+    @Test
+    @Disabled("This test fails because the mock network uses the same address space for all mock nodes. Thus all" +
+            "nodes are in the same plane all the time")
+    fun `different parties can be in different planes`() {
+        partyA.startFlow(CreateNetworkIdentityPlane("for-a", listOf())).getOrThrow(network)
+        partyA.startFlow(SetCurrentNetworkIdentityPlaneByName("for-a"))
+
+        partyB.startFlow(CreateNetworkIdentityPlane("for-b", listOf())).getOrThrow(network)
+        partyB.startFlow(SetCurrentNetworkIdentityPlaneByName("for-b"))
+
+        partyC.startFlow(CreateNetworkIdentityPlane("for-c", listOf())).getOrThrow(network)
+        partyC.startFlow(SetCurrentNetworkIdentityPlaneByName("for-c"))
+
+        assert(partyA.startFlow(GetCurrentNetworkIdentityPlane()).getOrThrow(network)!!.name == "for-a")
+        assert(partyB.startFlow(GetCurrentNetworkIdentityPlane()).getOrThrow(network)!!.name == "for-b")
+        assert(partyC.startFlow(GetCurrentNetworkIdentityPlane()).getOrThrow(network)!!.name == "for-c")
+
+        partyA.startFlow(SetCurrentNetworkIdentityPlaneByName("test-plane"))
+        partyB.startFlow(SetCurrentNetworkIdentityPlaneByName("test-plane"))
+        partyC.startFlow(SetCurrentNetworkIdentityPlaneByName("test-plane"))
     }
 }

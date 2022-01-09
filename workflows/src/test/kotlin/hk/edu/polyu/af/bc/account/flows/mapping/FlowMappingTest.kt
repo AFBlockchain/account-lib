@@ -12,9 +12,7 @@ import net.corda.core.flows.FlowLogic
 import net.corda.core.transactions.SignedTransaction
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.StartedMockNode
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -30,6 +28,8 @@ class SendMessageUser(private val sender: String,
     }
 }
 
+@Disabled
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FlowMappingTest{
     private lateinit var network: MockNetwork
     private lateinit var a: StartedMockNode
@@ -39,7 +39,7 @@ class FlowMappingTest{
         val logger: Logger = LoggerFactory.getLogger(FlowMappingTest::class.java)
     }
 
-    @Before
+    @BeforeAll
     fun setup() {
         network = MockNetwork(mockNetworkParameters)
         a = network.createPartyNode()
@@ -58,7 +58,7 @@ class FlowMappingTest{
         logger.info("User created: user2")
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         network.stopNodes()
     }

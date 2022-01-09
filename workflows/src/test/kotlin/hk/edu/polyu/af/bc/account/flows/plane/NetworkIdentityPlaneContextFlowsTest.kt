@@ -5,9 +5,11 @@ import hk.edu.polyu.af.bc.account.flows.getOrThrow
 import hk.edu.polyu.af.bc.account.flows.output
 import hk.edu.polyu.af.bc.account.flows.party
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
-import org.junit.Test
-import java.lang.IllegalArgumentException
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NetworkIdentityPlaneContextFlowsTest: UnitTestBase() {
     @Test
     fun `can set and get IdentityPlane at one nodes`() {
@@ -33,14 +35,16 @@ class NetworkIdentityPlaneContextFlowsTest: UnitTestBase() {
         assert(currentPlane.name == plane.name)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `should throw exception when the plane is not known`() {
-        partyA.startFlow(SetCurrentNetworkIdentityPlaneByName("no-such-plane"))
+        assertThrows<IllegalArgumentException> {
+            partyA.startFlow(SetCurrentNetworkIdentityPlaneByName("no-such-plane")).getOrThrow(network)
+        }
     }
 
     @Test
     fun `can set the plane when the plane is not created by current node`() {
-        val plane = partyA.startFlow(CreateNetworkIdentityPlane("plane-abc", listOf(partyA.party(), partyB.party(), partyC.party())))
+        val plane = partyA.startFlow(CreateNetworkIdentityPlane("plane-abc", listOf(partyB.party(), partyC.party())))
             .getOrThrow(network)
             .output(NetworkIdentityPlane::class.java)
 

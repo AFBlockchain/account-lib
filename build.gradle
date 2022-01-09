@@ -75,6 +75,7 @@ allprojects {
     }
 
     test {
+        useJUnitPlatform()
         testLogging.showStandardStreams = true
     }
 }
