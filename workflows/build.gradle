@@ -57,6 +57,7 @@ dependencies {
     testCompile 'org.testcontainers:testcontainers:1.16.1'
     testCompile "org.testcontainers:junit-jupiter:1.16.1"
     testCompile 'com.google.guava:guava:31.0.1-jre'
+    testCompile 'com.github.manosbatsis.corda.testacles:corda-testacles-nodedriver:0.24'
 }
 
 task integrationTest(type: Test, dependsOn: [":bundleCordapps"]) {
