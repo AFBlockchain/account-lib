@@ -66,3 +66,5 @@ task integrationTest(type: Test, dependsOn: [":bundleCordapps"]) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
+
+archivesBaseName='corid-workflows'
