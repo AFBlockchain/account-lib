@@ -6,6 +6,8 @@ import com.r3.corda.lib.accounts.workflows.flows.CreateAccount
 import com.r3.corda.lib.accounts.workflows.flows.ShareAccountInfo
 import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
+import net.corda.core.flows.StartableByRPC
+import net.corda.core.flows.StartableByService
 import net.corda.core.identity.Party
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -18,6 +20,8 @@ import java.util.*
  *
  * TODO: introduce naming constraint. Assume simple name (alphabet + digits) for now.
  */
+@StartableByService
+@StartableByRPC
 class CreateUser(private val username: String): FlowLogic<Unit>() {
     @Suspendable
     override fun call() {
@@ -33,6 +37,8 @@ class CreateUser(private val username: String): FlowLogic<Unit>() {
 /**
  * Check whether the user given exists in the current identity plane.
  */
+@StartableByService
+@StartableByRPC
 class IsUserExists(private val username: String): FlowLogic<Boolean>() {
     override fun call(): Boolean {
         return !isAccountNonExist(toAccountName(username))

@@ -10,6 +10,7 @@ import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetworkParameters
 import net.corda.testing.node.StartedMockNode
 import net.corda.testing.node.TestCordapp
+import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration
 
 val mockNetworkParameters = MockNetworkParameters(cordappsForAllNodes = listOf(

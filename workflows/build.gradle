@@ -51,11 +51,17 @@ dependencies {
     cordapp "$confidential_id_release_group:ci-workflows:$confidential_id_release_version"
     cordapp "$accounts_release_group:accounts-workflows:$accounts_release_version"
 
-    testImplementation fileTree("../libs") { include '*jar' }
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    // Testing
+    testCompile fileTree("../libs") { include '*jar' }
+    testCompile 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testCompile 'org.testcontainers:testcontainers:1.16.1'
+    testCompile "org.testcontainers:junit-jupiter:1.16.1"
+    testCompile 'com.google.guava:guava:31.0.1-jre'
 }
 
-task integrationTest(type: Test, dependsOn: []) {
+task integrationTest(type: Test, dependsOn: [":bundleCordapps"]) {
+    useJUnitPlatform()
+    testLogging.showStandardStreams = true
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
