@@ -5,7 +5,7 @@ import hk.edu.polyu.af.bc.account.contracts.NetworkIdentityPlaneContract.Command
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.testing.node.ledger
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class NetworkIdentityPlaneContractTest {
     @Test
