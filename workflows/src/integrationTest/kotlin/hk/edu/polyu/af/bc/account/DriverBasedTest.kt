@@ -16,6 +16,7 @@ import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.flows.FlowException
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.testing.driver.NodeHandle
+import net.corda.testing.node.StartedMockNode
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.Logger
@@ -25,6 +26,7 @@ import kotlin.test.assertTrue
 
 @ExtendWith(NodeDriverNetworkExtension::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DriverBasedTest {
     companion object {
         val logger: Logger = LoggerFactory.getLogger(DriverBasedTest::class.java)
@@ -34,14 +36,19 @@ class DriverBasedTest {
         val nodeDriverConfig: NodeDriverNodesConfig = customNodeDriverConfig
     }
 
+    lateinit var proxyA: CordaRPCOps
+    lateinit var proxyB: CordaRPCOps
+
     @Test
     @Order(1)
-    fun createPlane(nodeHandles: NodeHandles) {
-        val nodeA: NodeHandle = nodeHandles.getNode("partyA")
-        val nodeB: NodeHandle = nodeHandles.getNode("partyB")
-        val proxyA: CordaRPCOps = nodeA.rpc
-        val proxyB: CordaRPCOps = nodeB.rpc
+    fun setUp(nodeHandles: NodeHandles) {
+        proxyA = nodeHandles.getNode("partyA").rpc
+        proxyB = nodeHandles.getNode("partyB").rpc
+    }
 
+    @Test
+    @Order(2)
+    fun createPlane(nodeHandles: NodeHandles) {
         val tx = proxyA.startFlowDynamic(CreateNetworkIdentityPlane::class.java, "plane1", listOf(proxyB.party()))
             .returnValue.get()
         logger.info("Transaction: {}", tx)
@@ -53,13 +60,8 @@ class DriverBasedTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     fun setPlane(nodeHandles: NodeHandles) {
-        val nodeA: NodeHandle = nodeHandles.getNode("partyA")
-        val nodeB: NodeHandle = nodeHandles.getNode("partyB")
-        val proxyA: CordaRPCOps = nodeA.rpc
-        val proxyB: CordaRPCOps = nodeB.rpc
-
         proxyA.startFlowDynamic(SetCurrentNetworkIdentityPlaneByName::class.java, "plane1").returnValue.get()
         proxyB.startFlowDynamic(SetCurrentNetworkIdentityPlaneByName::class.java, "plane1").returnValue.get()
 
@@ -68,13 +70,8 @@ class DriverBasedTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     fun createUsers(nodeHandles: NodeHandles) {
-        val nodeA: NodeHandle = nodeHandles.getNode("partyA")
-        val nodeB: NodeHandle = nodeHandles.getNode("partyB")
-        val proxyA: CordaRPCOps = nodeA.rpc
-        val proxyB: CordaRPCOps = nodeB.rpc
-
         proxyA.startFlowDynamic(CreateUser::class.java, "alice").returnValue.get()
         proxyB.startFlowDynamic(CreateUser::class.java, "bob").returnValue.get()
 
@@ -85,24 +82,16 @@ class DriverBasedTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     fun cannotCreateSameUser(nodeHandles: NodeHandles) {
-        val nodeA: NodeHandle = nodeHandles.getNode("partyA")
-        val proxyA: CordaRPCOps = nodeA.rpc
-
         assertThrows<Exception> {
             proxyA.startFlowDynamic(CreateUser::class.java, "bob").returnValue.get()
         }
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     fun canCreateSameUserInAnotherPlane(nodeHandles: NodeHandles) {
-        val nodeA: NodeHandle = nodeHandles.getNode("partyA")
-        val nodeB: NodeHandle = nodeHandles.getNode("partyB")
-        val proxyA: CordaRPCOps = nodeA.rpc
-        val proxyB: CordaRPCOps = nodeB.rpc
-
         proxyA.startFlowDynamic(CreateNetworkIdentityPlane::class.java, "plane2", listOf(proxyB.party()))
             .returnValue.get()
         proxyA.startFlowDynamic(SetCurrentNetworkIdentityPlaneByName::class.java, "plane2").returnValue.get()
@@ -117,13 +106,8 @@ class DriverBasedTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     fun canQueryPlanes(nodeHandles: NodeHandles) {
-        val nodeA: NodeHandle = nodeHandles.getNode("partyA")
-        val nodeB: NodeHandle = nodeHandles.getNode("partyB")
-        val proxyA: CordaRPCOps = nodeA.rpc
-        val proxyB: CordaRPCOps = nodeB.rpc
-
         listOf(proxyA, proxyB).forEach {
             val planes = it.startFlowDynamic(GetAllNetworkIdentityPlanes::class.java).returnValue.get().map { it.name }
             assertTrue(planes.containsAll(listOf("plane1", "plane2")))
