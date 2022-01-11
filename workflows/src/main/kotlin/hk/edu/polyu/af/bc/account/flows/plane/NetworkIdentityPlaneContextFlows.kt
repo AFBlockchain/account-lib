@@ -8,7 +8,8 @@ import net.corda.core.flows.StartableByService
 /// Flows to manage the current NetworkIdentityPlane at the corda node
 
 /**
- * Return the current [NetworkIdentityPlane] in the [NetworkIdentityPlaneContext].
+ * Return the current [NetworkIdentityPlane] in the [NetworkIdentityPlaneContext]. Return `null` if the context hasn't
+ * been set
  */
 @StartableByRPC
 @StartableByService
@@ -25,10 +26,17 @@ class GetCurrentNetworkIdentityPlane: FlowLogic<NetworkIdentityPlane?>() {
 @StartableByService
 class SetCurrentNetworkIdentityPlane(val plane: NetworkIdentityPlane): FlowLogic<Unit>() {
     override fun call() {
-        //TODO: check that the plane has been registered on this node
-        subFlow(GetNetworkIdentityPlaneByName(plane.name)) ?: throw IllegalArgumentException("Plane not found: $plane")
-        logger.info("Setting network identity plane to: $plane")
+        // no name matches
+        val queried = subFlow(GetNetworkIdentityPlaneByName(plane.name)) ?: throw IllegalArgumentException("Plane not found: $plane")
+        // are two planes really the same, despite having the same name?
+        require(queried.linearId == plane.linearId) {
+            "Cannot find plane: $plane. Although a plane of the same name was found: $queried"
+        }
+
         NetworkIdentityPlaneContext.currentPlane = plane
+        logger.info("Network identity plane is set to: $plane")
+
+        //TODO: if we are not a participant in the given plane, the call should fail
     }
 }
 

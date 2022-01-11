@@ -53,6 +53,8 @@ class IsUserExists(private val username: String): FlowLogic<Boolean>() {
 /**
  * Return all users in the current identity plane
  */
+@StartableByRPC
+@StartableByService
 class AllUsers(): FlowLogic<List<String>>() {
     override fun call(): List<String> {
         return subFlow(AllAccounts()).map {
@@ -62,24 +64,5 @@ class AllUsers(): FlowLogic<List<String>>() {
         }.map {
             it.split(DELIMINATOR)[1]
         }
-    }
-}
-
-/**
- * Get the underlying [UUID] for this user. Primarily, this identifier is used for vault query.
- */
-class GetUserUUID(private val username: String): FlowLogic<UUID>() {
-    override fun call(): UUID {
-        val accountInfo = toAccountInfo(username) ?: throw IllegalArgumentException("User not found: $username")
-        return accountInfo.identifier.id
-    }
-}
-
-@StartableByService
-@StartableByRPC
-class GetUserStates<out T: ContractState>(private val username: String, private val stateClass: Class<T>):
-    FlowLogic<List<StateAndRef<T>>>() {
-    override fun call(): List<StateAndRef<T>> {
-        return getUserStates(username, stateClass)
     }
 }

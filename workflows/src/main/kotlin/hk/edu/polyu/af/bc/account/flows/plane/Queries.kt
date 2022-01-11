@@ -11,7 +11,7 @@ import net.corda.core.flows.StartableByService
  */
 @StartableByRPC
 @StartableByService
-class GetAllNetworkIdentityPlanes(): FlowLogic<List<NetworkIdentityPlane>>() {
+class GetAllNetworkIdentityPlanes: FlowLogic<List<NetworkIdentityPlane>>() {
     override fun call(): List<NetworkIdentityPlane> {
         val planeRef = serviceHub.vaultService.queryBy(NetworkIdentityPlane::class.java).states
         return planeRef.map{it.state.data}
@@ -25,6 +25,8 @@ class GetAllNetworkIdentityPlanes(): FlowLogic<List<NetworkIdentityPlane>>() {
 @StartableByService
 class GetNetworkIdentityPlaneByName(val name: String): FlowLogic<NetworkIdentityPlane?>() {
     override fun call(): NetworkIdentityPlane? {
+        //TODO: make more efficient queries (not in memory)
+
         val allPlanes = subFlow(GetAllNetworkIdentityPlanes())
         return allPlanes.firstOrNull { it.name == name }
     }
