@@ -17,6 +17,7 @@ val mockNetworkParameters = MockNetworkParameters(cordappsForAllNodes = listOf(
     TestCordapp.findCordapp("hk.edu.polyu.af.bc.message.contracts"),
     TestCordapp.findCordapp("hk.edu.polyu.af.bc.message.flows"),
     TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.flows"),
+    TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.contracts"),
     TestCordapp.findCordapp("com.r3.corda.lib.accounts.workflows.flows"),
     TestCordapp.findCordapp("com.r3.corda.lib.accounts.contracts")
 ))

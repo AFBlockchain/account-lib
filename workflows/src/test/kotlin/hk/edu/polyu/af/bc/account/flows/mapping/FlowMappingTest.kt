@@ -5,11 +5,13 @@ import hk.edu.polyu.af.bc.account.flows.*
 import hk.edu.polyu.af.bc.account.flows.plane.CreateNetworkIdentityPlane
 import hk.edu.polyu.af.bc.account.flows.plane.SetCurrentNetworkIdentityPlane
 import hk.edu.polyu.af.bc.account.flows.user.CreateUser
+import hk.edu.polyu.af.bc.account.flows.user.GetUserStates
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import hk.edu.polyu.af.bc.message.flows.SendMessage
 import hk.edu.polyu.af.bc.message.states.MessageState
 import net.corda.core.flows.FlowLogic
 import net.corda.core.transactions.SignedTransaction
+import net.corda.testing.common.internal.log
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.StartedMockNode
 import org.junit.jupiter.api.*
@@ -28,7 +30,6 @@ class SendMessageUser(private val sender: String,
     }
 }
 
-@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FlowMappingTest{
     private lateinit var network: MockNetwork
@@ -53,9 +54,7 @@ class FlowMappingTest{
 
         // create cordapp users
         a.startFlow(CreateUser("user1")).getOrThrow(network)
-        logger.info("User created: user1")
         b.startFlow(CreateUser("user2")).getOrThrow(network)
-        logger.info("User created: user2")
     }
 
     @AfterAll
@@ -72,6 +71,20 @@ class FlowMappingTest{
         assert(messageState.msg == "Hello Cordapp")
         a.assertHaveState(messageState, messageStateComparator)
         b.assertHaveState(messageState, messageStateComparator)
+    }
+
+    @Test
+    fun canQueryVaultForUsers() {
+        a.startFlow(SendMessageUser("user1", "user2", "Hello"))
+            .getOrThrow(network)
+
+        val queriedFromA = a.startFlow(GetUserStates("user1", MessageState::class.java)).getOrThrow(network)
+        val queriedFromB = b.startFlow(GetUserStates("user2", MessageState::class.java)).getOrThrow(network)
+
+        listOf(queriedFromA, queriedFromB).forEach {
+            logger.info("States: {}", it)
+            assert(it.map { it.state.data }.any { it.msg == "Hello" })
+        }
     }
 
     private val messageStateComparator = {

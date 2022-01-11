@@ -4,12 +4,15 @@ import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.accounts.workflows.flows.AllAccounts
 import com.r3.corda.lib.accounts.workflows.flows.CreateAccount
 import com.r3.corda.lib.accounts.workflows.flows.ShareAccountInfo
+import hk.edu.polyu.af.bc.account.flows.mapping.toAccountInfo
+import net.corda.core.contracts.ContractState
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.flows.StartableByService
 import net.corda.core.identity.Party
-import org.slf4j.LoggerFactory
+import java.lang.IllegalArgumentException
 import java.util.*
 
 // Representation of a user is just a String. So there's no need for "reading" and "updating" a user
@@ -31,6 +34,8 @@ class CreateUser(private val username: String): FlowLogic<Unit>() {
         // share the account within identity plane
         val accountRef = subFlow(CreateAccount(accountName))
         subFlow(ShareAccountInfo(accountRef, context().participants as List<Party>))
+
+        logger.info("User successfully created at ${context()}: $username")
     }
 }
 
@@ -63,8 +68,18 @@ class AllUsers(): FlowLogic<List<String>>() {
 /**
  * Get the underlying [UUID] for this user. Primarily, this identifier is used for vault query.
  */
-class GetUserUUID(val username: String): FlowLogic<UUID>() {
+class GetUserUUID(private val username: String): FlowLogic<UUID>() {
     override fun call(): UUID {
-        TODO("Not yet implemented")
+        val accountInfo = toAccountInfo(username) ?: throw IllegalArgumentException("User not found: $username")
+        return accountInfo.identifier.id
+    }
+}
+
+@StartableByService
+@StartableByRPC
+class GetUserStates<out T: ContractState>(private val username: String, private val stateClass: Class<T>):
+    FlowLogic<List<StateAndRef<T>>>() {
+    override fun call(): List<StateAndRef<T>> {
+        return getUserStates(username, stateClass)
     }
 }
