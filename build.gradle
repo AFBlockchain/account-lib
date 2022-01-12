@@ -164,3 +164,19 @@ task bundleCordapps(dependsOn: ['jar']) {
         }
     }
 }
+
+task publishLocal(dependsOn: ['jar']) {
+    doLast {
+        project.delete("artifacts/")
+
+        copy {
+            from 'contracts/build/libs/'
+            into 'artifacts/'
+        }
+
+        copy {
+            from 'workflows/build/libs/'
+            into 'artifacts/'
+        }
+    }
+}
