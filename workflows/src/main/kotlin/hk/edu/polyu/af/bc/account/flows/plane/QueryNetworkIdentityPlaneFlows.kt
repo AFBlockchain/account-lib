@@ -1,6 +1,7 @@
 package hk.edu.polyu.af.bc.account.flows.plane
 
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
+import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.flows.StartableByService
@@ -27,6 +28,10 @@ class GetAllNetworkIdentityPlanes(): FlowLogic<List<NetworkIdentityPlane>>() {
 class GetNetworkIdentityPlaneByName(val name: String): FlowLogic<NetworkIdentityPlane>() {
     override fun call(): NetworkIdentityPlane {
         val allPlanes = subFlow(GetAllNetworkIdentityPlanes())
-        return allPlanes.filter{it.name == name}[0]
+        val result = allPlanes.filter{it.name == name}
+        if(result.isEmpty()) {
+            throw FlowException("The $name is not exist")
+        }
+        return result[0]
     }
 }
