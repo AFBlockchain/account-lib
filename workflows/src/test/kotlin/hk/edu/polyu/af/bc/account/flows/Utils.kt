@@ -10,18 +10,18 @@ import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.MockNetworkParameters
 import net.corda.testing.node.StartedMockNode
 import net.corda.testing.node.TestCordapp
-import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Duration
 
-val mockNetworkParameters = MockNetworkParameters(cordappsForAllNodes = listOf(
-    TestCordapp.findCordapp("hk.edu.polyu.af.bc.message.contracts"),
-    TestCordapp.findCordapp("hk.edu.polyu.af.bc.message.flows"),
-    TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.flows"),
-    TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.contracts"),
-    TestCordapp.findCordapp("com.r3.corda.lib.accounts.workflows.flows"),
-    TestCordapp.findCordapp("com.r3.corda.lib.accounts.contracts")
-))
-
+val mockNetworkParameters = MockNetworkParameters(
+    cordappsForAllNodes = listOf(
+        TestCordapp.findCordapp("hk.edu.polyu.af.bc.message.contracts"),
+        TestCordapp.findCordapp("hk.edu.polyu.af.bc.message.flows"),
+        TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.flows"),
+        TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.contracts"),
+        TestCordapp.findCordapp("com.r3.corda.lib.accounts.workflows.flows"),
+        TestCordapp.findCordapp("com.r3.corda.lib.accounts.contracts")
+    )
+)
 
 fun StartedMockNode.party(): Party {
     return this.info.legalIdentities[0]
@@ -30,19 +30,19 @@ fun StartedMockNode.party(): Party {
 /**
  * Get the first output of type `clazz` from the tx.
  */
-inline fun <reified T: ContractState> SignedTransaction.output(clazz: Class<T>): T {
+inline fun <reified T : ContractState> SignedTransaction.output(clazz: Class<T>): T {
     return coreTransaction.filterOutputs<T> { true }[0]
 }
 
 /**
  * Assert the node's vault contain the given state.
  */
-fun <T: ContractState> StartedMockNode.assertHaveState(state: T, comparator: (s1: T, s2: T) -> Boolean) {
+fun <T : ContractState> StartedMockNode.assertHaveState(state: T, comparator: (s1: T, s2: T) -> Boolean) {
     val hasNone = services.vaultService.queryBy(state.javaClass).states.none { comparator(state, it.state.data) }
     if (hasNone) throw AssertionError("State not found in ${info.legalIdentities[0]}: $state")
 }
 
-fun <T: ContractState> StartedMockNode.assertHaveState(stateClass: Class<T>, matcher: (s: T) -> Boolean) {
+fun <T : ContractState> StartedMockNode.assertHaveState(stateClass: Class<T>, matcher: (s: T) -> Boolean) {
     val matched =
         services.vaultService.queryBy(stateClass).states.map { it.state.data }.any { matcher(it) }
 
@@ -53,10 +53,11 @@ fun <T: ContractState> StartedMockNode.assertHaveState(stateClass: Class<T>, mat
  * Wrap `getOrThrow(Duration)` by inserting a network run.
  */
 fun <V> CordaFuture<V>.getOrThrow(network: MockNetwork, rounds: Int = -1, timeout: Duration? = null): V {
-    network.runNetwork(rounds);
+    network.runNetwork(rounds)
     return getOrThrow(timeout)
 }
 
 val planeComparator = {
-        p1: NetworkIdentityPlane, p2: NetworkIdentityPlane -> p1.linearId == p2.linearId
+    p1: NetworkIdentityPlane, p2: NetworkIdentityPlane ->
+    p1.linearId == p2.linearId
 }

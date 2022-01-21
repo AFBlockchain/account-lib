@@ -5,11 +5,11 @@ import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.flows.StartableByService
-import java.util.*
+import java.util.UUID
 
 @StartableByRPC
 @StartableByService
-class GetUserUUID(private val username: String): FlowLogic<UUID>() {
+class GetUserUUID(private val username: String) : FlowLogic<UUID>() {
     override fun call(): UUID {
         return toUUID(username)
     }
@@ -17,7 +17,7 @@ class GetUserUUID(private val username: String): FlowLogic<UUID>() {
 
 @StartableByService
 @StartableByRPC
-class GetUserStates<out T: ContractState>(private val username: String, private val stateClass: Class<T>):
+class GetUserStates<out T : ContractState>(private val username: String, private val stateClass: Class<T>) :
     FlowLogic<List<StateAndRef<T>>>() {
     override fun call(): List<StateAndRef<T>> {
         return getUserStates(username, stateClass)

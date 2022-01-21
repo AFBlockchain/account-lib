@@ -11,8 +11,7 @@ import net.corda.core.identity.AnonymousParty
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
-/// This package contains utilities for defining application-level workflows using CordappUser for the user identity
-
+// / This package contains utilities for defining application-level workflows using CordappUser for the user identity
 
 /**
  * Query the underlying [AccountInfo] from vault.

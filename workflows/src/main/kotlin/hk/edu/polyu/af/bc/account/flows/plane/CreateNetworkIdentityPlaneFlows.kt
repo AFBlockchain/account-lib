@@ -4,12 +4,22 @@ import co.paralleluniverse.fibers.Suspendable
 import hk.edu.polyu.af.bc.account.contracts.NetworkIdentityPlaneContract
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.contracts.UniqueIdentifier
-import net.corda.core.flows.*
+import net.corda.core.flows.CollectSignaturesFlow
+import net.corda.core.flows.FinalityFlow
+import net.corda.core.flows.FlowException
+import net.corda.core.flows.FlowLogic
+import net.corda.core.flows.FlowSession
+import net.corda.core.flows.InitiatedBy
+import net.corda.core.flows.InitiatingFlow
+import net.corda.core.flows.ReceiveFinalityFlow
+import net.corda.core.flows.SignTransactionFlow
+import net.corda.core.flows.StartableByRPC
+import net.corda.core.flows.StartableByService
 import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 
-/// The flow hierarchy follows https://github.com/corda/accounts/blob/master/workflows/src/main/kotlin/com/r3/corda/lib/accounts/workflows/flows/RequestKeyForAccountFlows.kt
+// / The flow hierarchy follows https://github.com/corda/accounts/blob/master/workflows/src/main/kotlin/com/r3/corda/lib/accounts/workflows/flows/RequestKeyForAccountFlows.kt
 
 /**
  * In-lined subflow to create a [NetworkIdentityPlane]. This flow and its counter part [CreateNetworkIdentityPlaneResponderFlow]
@@ -25,7 +35,7 @@ import net.corda.core.transactions.TransactionBuilder
 class CreateNetworkIdentityPlane(
     private val name: String,
     private val otherParticipants: List<Party>
-): FlowLogic<SignedTransaction>() {
+) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
         checkPlaneExistence(name)
@@ -37,13 +47,13 @@ class CreateNetworkIdentityPlane(
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val transactionBuilder = TransactionBuilder(notary = notary).apply {
             addOutputState(networkIdentityPlane)
-            addCommand(NetworkIdentityPlaneContract.Commands.Create(),networkIdentityPlane.participants.map{it.owningKey})
+            addCommand(NetworkIdentityPlaneContract.Commands.Create(), networkIdentityPlane.participants.map { it.owningKey })
         }
 
         transactionBuilder.verify(serviceHub)
         val partSignedTx = serviceHub.signInitialTransaction(transactionBuilder)
 
-        val otherPartySessions = otherParticipants.map{initiateFlow(it)}
+        val otherPartySessions = otherParticipants.map { initiateFlow(it) }
         val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, otherPartySessions))
         return subFlow(FinalityFlow(fullySignedTx, otherPartySessions))
     }
@@ -52,7 +62,7 @@ class CreateNetworkIdentityPlane(
 @InitiatedBy(CreateNetworkIdentityPlane::class)
 class CreateNetworkIdentityPlaneResponder(
     private val otherPartySession: FlowSession
-):FlowLogic<SignedTransaction>() {
+) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
         val signTransactionFlow = object : SignTransactionFlow(otherPartySession) {

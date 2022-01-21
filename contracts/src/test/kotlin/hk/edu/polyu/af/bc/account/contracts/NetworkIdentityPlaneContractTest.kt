@@ -17,15 +17,15 @@ class NetworkIdentityPlaneContractTest {
                 output(NetworkIdentityPlaneContract.ID, plane)
 
                 tweak { // with only A's signature
-                    command(listOf(identityA.publicKey),Create())
+                    command(listOf(identityA.publicKey), Create())
                     fails()
                 }
                 tweak { // with A,B's signatures
-                    command(listOf(identityA.publicKey, identityB.publicKey),Create())
+                    command(listOf(identityA.publicKey, identityB.publicKey), Create())
                     fails()
                 }
 
-                command(listOf(identityA.publicKey, identityB.publicKey, identityC.publicKey),Create())
+                command(listOf(identityA.publicKey, identityB.publicKey, identityC.publicKey), Create())
                 verifies()
             }
         }
@@ -36,9 +36,9 @@ class NetworkIdentityPlaneContractTest {
         ledgerService.ledger {
             val plane = transaction {
                 output(NetworkIdentityPlaneContract.ID, "input", NetworkIdentityPlane("test-plane", listOf(identityA.party, identityB.party, identityC.party), UniqueIdentifier()))
-                command(listOf(identityA.publicKey, identityB.publicKey, identityC.publicKey),Create())
+                command(listOf(identityA.publicKey, identityB.publicKey, identityC.publicKey), Create())
                 verifies()
-            }.outputsOfType(NetworkIdentityPlane::class.java)[0].apply { name="test-plane-2" }
+            }.outputsOfType(NetworkIdentityPlane::class.java)[0].apply { name = "test-plane-2" }
 
             transaction {
                 input("input")

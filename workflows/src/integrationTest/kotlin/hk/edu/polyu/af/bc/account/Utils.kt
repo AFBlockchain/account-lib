@@ -8,11 +8,10 @@ import net.corda.core.messaging.CordaRPCOps
 import net.corda.testing.core.ALICE_NAME
 import net.corda.testing.core.BOB_NAME
 
-
 val nodeParamsHelper = NodeParamsHelper()
 
 val customNodeDriverConfig: NodeDriverNodesConfig =
-    SimpleNodeDriverNodesConfig (
+    SimpleNodeDriverNodesConfig(
         cordappPackages = listOf(
             "hk.edu.polyu.af.bc.account.contracts",
             "hk.edu.polyu.af.bc.account.flows",
@@ -26,7 +25,7 @@ val customNodeDriverConfig: NodeDriverNodesConfig =
 
 fun CordaRPCOps.party() = nodeInfo().legalIdentities[0]
 
-fun <T: ContractState> CordaRPCOps.assertHaveState(state: T, comparator: (s1: T, s2: T) -> Boolean) {
+fun <T : ContractState> CordaRPCOps.assertHaveState(state: T, comparator: (s1: T, s2: T) -> Boolean) {
     val hasNone = this.vaultQuery(state.javaClass).states.none { comparator(state, it.state.data) }
     if (hasNone) throw AssertionError("State not found in ${party()}: $state")
 }

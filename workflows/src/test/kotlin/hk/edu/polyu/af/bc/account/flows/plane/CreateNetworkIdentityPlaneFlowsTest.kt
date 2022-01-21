@@ -1,6 +1,11 @@
 package hk.edu.polyu.af.bc.account.flows.plane
 
-import hk.edu.polyu.af.bc.account.flows.*
+import hk.edu.polyu.af.bc.account.flows.UnitTestBase
+import hk.edu.polyu.af.bc.account.flows.assertHaveState
+import hk.edu.polyu.af.bc.account.flows.getOrThrow
+import hk.edu.polyu.af.bc.account.flows.output
+import hk.edu.polyu.af.bc.account.flows.party
+import hk.edu.polyu.af.bc.account.flows.planeComparator
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.flows.FlowException
 import org.junit.jupiter.api.Test
@@ -10,7 +15,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CreateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
+class CreateNetworkIdentityPlaneFlowsTest : UnitTestBase() {
     companion object {
         val logger: Logger = LoggerFactory.getLogger(CreateNetworkIdentityPlaneFlowsTest::class.java)
     }
@@ -27,7 +32,6 @@ class CreateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
             it.assertHaveState(plane, planeComparator)
         }
     }
-
 
     @Test
     fun `should rejects creation when there is name conflict at other parties`() {

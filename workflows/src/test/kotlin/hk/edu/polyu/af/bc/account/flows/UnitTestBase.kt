@@ -26,12 +26,16 @@ abstract class UnitTestBase {
     @BeforeAll
     open fun setup() {
         network = MockNetwork(
-            MockNetworkParameters(cordappsForAllNodes = listOf(
-                TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.contracts"),
-                TestCordapp.findCordapp("com.r3.corda.lib.accounts.workflows.flows"),
-                TestCordapp.findCordapp("com.r3.corda.lib.accounts.contracts"),
-                TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.flows")
-            ), networkParameters = testNetworkParameters(minimumPlatformVersion = 4)))
+            MockNetworkParameters(
+                cordappsForAllNodes = listOf(
+                    TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.contracts"),
+                    TestCordapp.findCordapp("com.r3.corda.lib.accounts.workflows.flows"),
+                    TestCordapp.findCordapp("com.r3.corda.lib.accounts.contracts"),
+                    TestCordapp.findCordapp("hk.edu.polyu.af.bc.account.flows")
+                ),
+                networkParameters = testNetworkParameters(minimumPlatformVersion = 4)
+            )
+        )
 
         partyA = network.createPartyNode(CordaX500Name.parse("O=PartyA, L=Athens, C=GR"))
         partyB = network.createPartyNode(CordaX500Name.parse("O=PartyB, L=Athens, C=GR"))

@@ -10,12 +10,15 @@ import hk.edu.polyu.af.bc.account.flows.plane.SetCurrentNetworkIdentityPlane
 import hk.edu.polyu.af.bc.account.flows.plane.SetCurrentNetworkIdentityPlaneByName
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.flows.FlowException
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserManagementFlowsTest: UnitTestBase() {
+class UserManagementFlowsTest : UnitTestBase() {
     @BeforeAll
     override fun setup() {
         super.setup()
@@ -78,12 +81,14 @@ class UserManagementFlowsTest: UnitTestBase() {
 
         assertFalse(partyA.startFlow(IsUserExists("gina")).getOrThrow(network))
 
-        partyA.startFlow(SetCurrentNetworkIdentityPlaneByName("test-plane")) //restore
+        partyA.startFlow(SetCurrentNetworkIdentityPlaneByName("test-plane")) // restore
     }
 
     @Test
-    @Disabled("This test fails because the mock network uses the same address space for all mock nodes. Thus all" +
-            "nodes are in the same plane all the time")
+    @Disabled(
+        "This test fails because the mock network uses the same address space for all mock nodes. Thus all" +
+            "nodes are in the same plane all the time"
+    )
     fun `different parties can be in different planes`() {
         partyA.startFlow(CreateNetworkIdentityPlane("for-a", listOf())).getOrThrow(network)
         partyA.startFlow(SetCurrentNetworkIdentityPlaneByName("for-a"))

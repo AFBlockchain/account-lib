@@ -24,7 +24,7 @@ class NetworkIdentityPlane(
     var name: String,
     private val partiesInPlane: List<Party>,
     override val linearId: UniqueIdentifier
-): ContractState, LinearState {
+) : ContractState, LinearState {
     override val participants: List<AbstractParty>
         get() = partiesInPlane
 

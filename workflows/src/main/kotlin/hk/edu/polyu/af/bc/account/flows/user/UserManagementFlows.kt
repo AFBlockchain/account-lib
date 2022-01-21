@@ -4,16 +4,11 @@ import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.accounts.workflows.flows.AllAccounts
 import com.r3.corda.lib.accounts.workflows.flows.CreateAccount
 import com.r3.corda.lib.accounts.workflows.flows.ShareAccountInfo
-import hk.edu.polyu.af.bc.account.flows.mapping.toAccountInfo
-import net.corda.core.contracts.ContractState
-import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.flows.StartableByService
 import net.corda.core.identity.Party
-import java.lang.IllegalArgumentException
-import java.util.*
 
 // Representation of a user is just a String. So there's no need for "reading" and "updating" a user
 // The meaning of "deleting" a user is not clear yet.
@@ -25,7 +20,7 @@ import java.util.*
  */
 @StartableByService
 @StartableByRPC
-class CreateUser(private val username: String): FlowLogic<Unit>() {
+class CreateUser(private val username: String) : FlowLogic<Unit>() {
     @Suspendable
     override fun call() {
         val accountName = toAccountName(username)
@@ -44,7 +39,7 @@ class CreateUser(private val username: String): FlowLogic<Unit>() {
  */
 @StartableByService
 @StartableByRPC
-class IsUserExists(private val username: String): FlowLogic<Boolean>() {
+class IsUserExists(private val username: String) : FlowLogic<Boolean>() {
     override fun call(): Boolean {
         return !isAccountNonExist(toAccountName(username))
     }
@@ -55,7 +50,7 @@ class IsUserExists(private val username: String): FlowLogic<Boolean>() {
  */
 @StartableByRPC
 @StartableByService
-class AllUsers(): FlowLogic<List<String>>() {
+class AllUsers() : FlowLogic<List<String>>() {
     override fun call(): List<String> {
         return subFlow(AllAccounts()).map {
             it.state.data.name

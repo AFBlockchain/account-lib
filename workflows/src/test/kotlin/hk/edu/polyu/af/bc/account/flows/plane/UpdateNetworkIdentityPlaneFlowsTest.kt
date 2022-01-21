@@ -1,6 +1,11 @@
 package hk.edu.polyu.af.bc.account.flows.plane
 
-import hk.edu.polyu.af.bc.account.flows.*
+import hk.edu.polyu.af.bc.account.flows.UnitTestBase
+import hk.edu.polyu.af.bc.account.flows.assertHaveState
+import hk.edu.polyu.af.bc.account.flows.getOrThrow
+import hk.edu.polyu.af.bc.account.flows.output
+import hk.edu.polyu.af.bc.account.flows.party
+import hk.edu.polyu.af.bc.account.flows.planeComparator
 import hk.edu.polyu.af.bc.account.states.NetworkIdentityPlane
 import net.corda.core.contracts.LinearPointer
 import net.corda.core.contracts.StateAndRef
@@ -13,7 +18,7 @@ import org.slf4j.LoggerFactory
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UpdateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
+class UpdateNetworkIdentityPlaneFlowsTest : UnitTestBase() {
     companion object {
         val logger: Logger = LoggerFactory.getLogger(UpdateNetworkIdentityPlaneFlowsTest::class.java)
     }
@@ -26,24 +31,23 @@ class UpdateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
         val plane = tx1.output(NetworkIdentityPlane::class.java)
         logger.info("Plane: $plane")
 
-        //query the NetworkIdentityPlane by uuid
+        // query the NetworkIdentityPlane by uuid
         val networkIdentityPlaneRef: StateAndRef<NetworkIdentityPlane> = LinearPointer<NetworkIdentityPlane>(
             plane.linearId,
             NetworkIdentityPlane::class.java,
-            false).resolve(partyA.services)
-
+            false
+        ).resolve(partyA.services)
 
         logger.info("Update the name to plane 2")
-        val tx2 = partyA.startFlow(UpdateNetworkIdentityPlane("plane-2",networkIdentityPlaneRef)).getOrThrow(network)
+        val tx2 = partyA.startFlow(UpdateNetworkIdentityPlane("plane-2", networkIdentityPlaneRef)).getOrThrow(network)
 
         val plane2 = tx2.output(NetworkIdentityPlane::class.java)
         logger.info("Plane: $plane2")
 
         partyA.assertHaveState(plane2, planeComparator)
 
-        assertEquals("plane-2",plane2.name)
+        assertEquals("plane-2", plane2.name)
     }
-
 
     @Test
     fun `should rejects update when there is name conflict at other parties`() {
@@ -54,16 +58,17 @@ class UpdateNetworkIdentityPlaneFlowsTest: UnitTestBase() {
         partyB.startFlow(CreateNetworkIdentityPlane("plane-4", listOf(partyA.party()))).getOrThrow(network)
 
         logger.info("Update the name")
-        //query the NetworkIdentityPlane by uuid
+        // query the NetworkIdentityPlane by uuid
         val plane = tx1.output(NetworkIdentityPlane::class.java)
         val networkIdentityPlaneRef: StateAndRef<NetworkIdentityPlane> = LinearPointer(
             plane.linearId,
             NetworkIdentityPlane::class.java,
-            false).resolve(partyA.services)
+            false
+        ).resolve(partyA.services)
 
         logger.info("Update the name to plane-4")
         assertThrows<FlowException> {
-            partyA.startFlow(UpdateNetworkIdentityPlane("plane-4",networkIdentityPlaneRef)).getOrThrow(network)
+            partyA.startFlow(UpdateNetworkIdentityPlane("plane-4", networkIdentityPlaneRef)).getOrThrow(network)
         }
     }
 }

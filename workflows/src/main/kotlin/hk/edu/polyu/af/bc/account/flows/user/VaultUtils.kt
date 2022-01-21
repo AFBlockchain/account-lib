@@ -6,7 +6,7 @@ import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FlowLogic
 import net.corda.core.node.services.vault.QueryCriteria
 import java.lang.IllegalArgumentException
-import java.util.*
+import java.util.UUID
 
 /**
  * Map the user to the [UUID] of the underlying account. Used to form more flexible vault queries.
@@ -28,6 +28,6 @@ fun FlowLogic<*>.getUserQueryCriteria(username: String): QueryCriteria {
 /**
  * Get a list of [ContractState] of the given type for the given user.
  */
-fun <T: ContractState> FlowLogic<*>.getUserStates(username: String, clazz: Class<T>): List<StateAndRef<T>> {
+fun <T : ContractState> FlowLogic<*>.getUserStates(username: String, clazz: Class<T>): List<StateAndRef<T>> {
     return serviceHub.vaultService.queryBy(clazz, getUserQueryCriteria(username)).states
 }

@@ -19,7 +19,7 @@ fun context(): NetworkIdentityPlane = NetworkIdentityPlaneContext.currentPlane ?
 /**
  * Map the application username to account name
  */
-fun toAccountName(username: String): String = "${context().name}${DELIMINATOR}${username}"
+fun toAccountName(username: String): String = "${context().name}${DELIMINATOR}$username"
 
 /**
  * Check whether an account exists

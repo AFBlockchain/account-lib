@@ -10,7 +10,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class NetworkIdentityPlaneContextFlowsTest: UnitTestBase() {
+class NetworkIdentityPlaneContextFlowsTest : UnitTestBase() {
     @Test
     fun `can set and get IdentityPlane at one nodes`() {
         val plane = partyA.startFlow(CreateNetworkIdentityPlane("plane-a", listOf()))

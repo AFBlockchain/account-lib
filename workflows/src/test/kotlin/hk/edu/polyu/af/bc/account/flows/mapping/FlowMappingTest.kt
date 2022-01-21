@@ -1,7 +1,11 @@
 package hk.edu.polyu.af.bc.account.flows.mapping
 
 import co.paralleluniverse.fibers.Suspendable
-import hk.edu.polyu.af.bc.account.flows.*
+import hk.edu.polyu.af.bc.account.flows.assertHaveState
+import hk.edu.polyu.af.bc.account.flows.getOrThrow
+import hk.edu.polyu.af.bc.account.flows.mockNetworkParameters
+import hk.edu.polyu.af.bc.account.flows.output
+import hk.edu.polyu.af.bc.account.flows.party
 import hk.edu.polyu.af.bc.account.flows.plane.CreateNetworkIdentityPlane
 import hk.edu.polyu.af.bc.account.flows.plane.SetCurrentNetworkIdentityPlane
 import hk.edu.polyu.af.bc.account.flows.user.CreateUser
@@ -11,16 +15,20 @@ import hk.edu.polyu.af.bc.message.flows.SendMessage
 import hk.edu.polyu.af.bc.message.states.MessageState
 import net.corda.core.flows.FlowLogic
 import net.corda.core.transactions.SignedTransaction
-import net.corda.testing.common.internal.log
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.StartedMockNode
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class SendMessageUser(private val sender: String,
-                      private val receiver: String,
-                      private val msg: String): FlowLogic<SignedTransaction>() {
+class SendMessageUser(
+    private val sender: String,
+    private val receiver: String,
+    private val msg: String
+) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
         val senderId = toAnonymousParty(sender)
@@ -31,7 +39,7 @@ class SendMessageUser(private val sender: String,
 }
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FlowMappingTest{
+class FlowMappingTest {
     private lateinit var network: MockNetwork
     private lateinit var a: StartedMockNode
     private lateinit var b: StartedMockNode
@@ -88,6 +96,7 @@ class FlowMappingTest{
     }
 
     private val messageStateComparator = {
-        s1: MessageState, s2: MessageState -> s1.msg == s2.msg
+        s1: MessageState, s2: MessageState ->
+        s1.msg == s2.msg
     }
 }
